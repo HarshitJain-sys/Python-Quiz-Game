@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SkillCon</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f7f2ea;--surface:#fffdf8;--surface2:#f0e9db;--border:#e4d9c8;
+  --text:#2d2015;--muted:#9a8a75;--accent:#c2623f;--accent2:#d4845a;
+  --green:#3a7d44;--amber:#c08b2a;--red:#c0392b;--blue:#2e6da4;
+  --shadow:0 2px 12px rgba(100,70,30,.08);--shadow-lg:0 8px 32px rgba(100,70,30,.15);
+  --r:14px;--r-sm:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--surface2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+input,textarea,select{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);border-radius:var(--r-sm);padding:10px 14px;font:inherit;outline:none;transition:all .2s;box-shadow:inset 0 1px 3px rgba(0,0,0,.04)}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,98,63,.12)}
+textarea{resize:vertical;min-height:80px}
+label{font-size:11px;color:var(--muted);margin-bottom:5px;display:block;font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--r-sm);font:600 13px 'Inter',sans-serif;cursor:pointer;border:none;transition:all .18s;box-shadow:var(--shadow)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#b05535;box-shadow:var(--shadow-lg)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#2e6437}
+.btn-amber{background:var(--amber);color:#fff}.btn-amber:hover{background:#9a7020}
+.btn-red{background:rgba(192,57,43,.1);color:var(--red);border:1.5px solid rgba(192,57,43,.2);box-shadow:none}.btn-red:hover{background:rgba(192,57,43,.2)}
+.btn-ghost{background:var(--surface);color:var(--text);border:1.5px solid var(--border);box-shadow:none}.btn-ghost:hover{border-color:var(--accent)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:#1e5a8a}
+.btn-sm{padding:6px 13px;font-size:12px}
+.btn-full{width:100%;justify-content:center}
+.hidden{display:none!important}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600}
+.badge-assigned{background:rgba(154,138,117,.12);color:var(--muted)}
+.badge-accepted{background:rgba(46,109,164,.12);color:var(--blue)}
+.badge-awaiting_review{background:rgba(192,139,42,.15);color:var(--amber)}
+.badge-completed{background:rgba(58,125,68,.12);color:var(--green)}
+.badge-verified{background:rgba(58,125,68,.12);color:var(--green)}
+.badge-partial{background:rgba(192,139,42,.12);color:var(--amber)}
+.badge-unverified{background:rgba(154,138,117,.1);color:var(--muted)}
+.badge-top{background:linear-gradient(135deg,rgba(192,139,42,.2),rgba(192,98,63,.2));color:var(--amber)}
+.form-group{margin-bottom:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.err-msg{color:var(--red);font-size:12px;margin-top:6px;min-height:16px}
+
+/* TOAST */
+.toast-area{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 18px;font-size:13px;animation:toastIn .35s cubic-bezier(.34,1.56,.64,1);max-width:320px;box-shadow:var(--shadow-lg)}
+.toast-ok{border-color:rgba(58,125,68,.4);color:var(--green)}
+.toast-err{border-color:rgba(192,57,43,.4);color:var(--red)}
+.toast-info{border-color:rgba(46,109,164,.4);color:var(--blue)}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px) scale(.9)}to{opacity:1;transform:translateX(0) scale(1)}}
+
+/* OVERLAY & MODAL */
+.overlay{position:fixed;inset:0;background:rgba(45,32,21,.5);display:flex;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(8px);animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:28px;width:92%;max-width:540px;max-height:92vh;overflow-y:auto;animation:modalIn .3s cubic-bezier(.34,1.4,.64,1);box-shadow:var(--shadow-lg)}
+.modal-wide{max-width:700px}
+@keyframes modalIn{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-hd h3{font-size:18px;font-weight:700}
+.x-btn{background:var(--surface2);border:1.5px solid var(--border);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px;cursor:pointer;transition:all .15s;line-height:1;flex-shrink:0}
+.x-btn:hover{background:var(--border);color:var(--text)}
+
+/* LANDING */
+#screen-landing{min-height:100vh}
+.land-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 48px;border-bottom:1.5px solid var(--border);position:sticky;top:0;background:rgba(247,242,234,.95);backdrop-filter:blur(16px);box-shadow:0 1px 8px rgba(100,70,30,.07);z-index:100}
+.logo{font-size:22px;font-weight:900;letter-spacing:-1px;color:var(--text)}
+.logo span{color:var(--accent)}
+.land-hero{text-align:center;padding:100px 24px 70px;background:radial-gradient(ellipse 80% 50% at 50% 0,rgba(194,98,63,.09) 0,transparent 70%)}
+.land-hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;line-height:1.08;letter-spacing:-2px;margin-bottom:20px}
+.land-hero h1 em{color:var(--accent);font-style:normal}
+.land-hero p{font-size:17px;color:var(--muted);max-width:520px;margin:0 auto 36px;line-height:1.75}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;padding:0 48px 80px;max-width:1100px;margin:0 auto}
+.feat{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:24px;transition:all .22s;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.feat:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.feat-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:12px}
+.feat h3{font-size:14px;margin-bottom:5px;font-weight:700}
+.feat p{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* AUTH */
+#screen-auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse 70% 60% at 50% 0,rgba(194,98,63,.1) 0,transparent 70%)}
+.auth-box{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:36px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);animation:modalIn .3s cubic-bezier(.34,1.4,.64,1)}
+.auth-tabs{display:flex;gap:4px;background:var(--surface2);border-radius:var(--r-sm);padding:4px;margin-bottom:24px;border:1.5px solid var(--border)}
+.auth-tab{flex:1;padding:8px;border-radius:7px;font:600 13px 'Inter',sans-serif;cursor:pointer;border:none;background:none;color:var(--muted);transition:all .18s;text-align:center}
+.auth-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.role-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.role-opt{padding:14px;border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;text-align:center;transition:all .2s;font-size:13px;font-weight:600;color:var(--muted);background:var(--surface2)}
+.role-opt.active-client{border-color:var(--accent);background:rgba(194,98,63,.08);color:var(--accent);box-shadow:0 0 0 3px rgba(194,98,63,.1)}
+.role-opt.active-pro{border-color:var(--amber);background:rgba(192,139,42,.08);color:var(--amber);box-shadow:0 0 0 3px rgba(192,139,42,.1)}
+
+/* DASHBOARD */
+.dash{display:flex;min-height:100vh}
+.sidebar{width:235px;min-width:235px;height:100vh;position:sticky;top:0;border-right:1.5px solid var(--border);display:flex;flex-direction:column;padding:20px 0;background:var(--surface);box-shadow:2px 0 12px rgba(100,70,30,.06)}
+.sidebar-logo{padding:0 20px 18px;border-bottom:1.5px solid var(--border);margin-bottom:12px}
+.sidebar-user{padding:0 16px 16px;display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--border);margin-bottom:12px}
+.s-ava{width:38px;height:38px;border-radius:50%;border:2.5px solid var(--accent);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;overflow:hidden;box-shadow:0 0 0 3px rgba(194,98,63,.1)}
+.s-name{font-size:13px;font-weight:700}
+.s-role{font-size:11px;color:var(--muted)}
+.sidebar-nav{flex:1;padding:0 8px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .15s;border:none;background:none;width:100%;text-align:left;margin-bottom:3px}
+.nav-item:hover{background:var(--surface2);color:var(--text);transform:translateX(2px)}
+.nav-item.active{color:var(--accent);background:rgba(194,98,63,.1);font-weight:600}
+.nav-item.active-pro{color:var(--amber);background:rgba(192,139,42,.1);font-weight:600}
+.nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.sidebar-foot{padding:16px;border-top:1.5px solid var(--border)}
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.page-hd{padding:22px 28px 16px;border-bottom:1.5px solid var(--border);background:var(--surface);box-shadow:0 1px 6px rgba(100,70,30,.04);margin-bottom:0}
+.page-hd h2{font-size:21px;font-weight:800}
+.page-hd p{color:var(--muted);font-size:13px;margin-top:3px}
+.content{padding:20px 28px 32px}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
+.stat{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);transition:all .2s;cursor:default}
+.stat:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600}
+.stat-val{font-size:26px;font-weight:900}
+
+/* JOB CARDS */
+.job-list{display:flex;flex-direction:column;gap:10px}
+.jcard{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;box-shadow:var(--shadow);transition:all .2s;cursor:pointer}
+.jcard:hover{border-color:var(--accent);box-shadow:var(--shadow-lg);transform:translateY(-1px)}
+.jcard-info{flex:1;min-width:0}
+.jcard-title{font-weight:700;font-size:14px;margin-bottom:4px}
+.jcard-meta{font-size:12px;color:var(--muted);line-height:1.7}
+.jcard-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* PRO GRID */
+.pro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.pcard{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;cursor:pointer;transition:all .22s;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.pcard::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform:scaleX(0);transition:transform .22s;transform-origin:left}
+.pcard:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.pcard:hover::after{transform:scaleX(1)}
+.pcard-ava{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}
+.pcard-name{font-weight:700;font-size:15px}
+.pcard-cat{font-size:12px;color:var(--muted);margin:2px 0 8px;font-weight:500}
+.pcard-bio{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.stars{color:var(--amber)}
+.skill-tag{display:inline-flex;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:500;background:rgba(194,98,63,.08);border:1px solid rgba(194,98,63,.2);color:var(--accent);margin:2px}
+
+/* AVATAR */
+.ava-wrap{position:relative;display:inline-block;cursor:pointer}
+.ava-lg{width:82px;height:82px;border-radius:18px;border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;background:var(--surface2);overflow:hidden;box-shadow:var(--shadow);transition:all .2s}
+.ava-overlay{position:absolute;inset:0;border-radius:18px;background:rgba(45,32,21,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:20px}
+.ava-wrap:hover .ava-overlay{opacity:1}
+
+/* PORTFOLIO */
+.port-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.port-item{aspect-ratio:1;border-radius:var(--r-sm);overflow:hidden;border:1.5px solid var(--border);background:var(--surface2);position:relative;transition:transform .18s;cursor:pointer}
+.port-item:hover{transform:scale(1.04)}
+.port-item img{width:100%;height:100%;object-fit:cover}
+.port-del{position:absolute;top:4px;right:4px;background:rgba(192,57,43,.85);border:none;border-radius:4px;color:#fff;width:22px;height:22px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
+.port-item:hover .port-del{opacity:1}
+
+/* OTP BOX */
+.otp-box{background:linear-gradient(135deg,rgba(192,139,42,.08),rgba(192,139,42,.14));border:2px dashed rgba(192,139,42,.45);border-radius:var(--r);padding:22px;text-align:center;font-size:38px;font-weight:900;letter-spacing:12px;color:var(--amber);margin:16px 0;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(192,139,42,.2)}50%{box-shadow:0 0 0 10px transparent}}
+
+/* MESSAGES */
+.msg-area{height:280px;overflow-y:auto;background:var(--surface2);border-radius:var(--r-sm);padding:14px;display:flex;flex-direction:column;gap:10px;margin-bottom:12px;border:1.5px solid var(--border)}
+.msg-bubble{max-width:75%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5}
+.msg-me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+.msg-them{align-self:flex-start;background:var(--surface);border:1.5px solid var(--border);border-bottom-left-radius:4px}
+.msg-meta{font-size:10px;opacity:.65;margin-top:3px}
+.msg-input-row{display:flex;gap:8px}
+.msg-input-row input{flex:1}
+
+/* AVAIL TOGGLE */
+.avail-toggle{display:inline-flex;align-items:center;gap:10px;padding:11px 18px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);transition:all .22s;user-select:none;box-shadow:var(--shadow)}
+.avail-toggle.on{background:rgba(58,125,68,.1);border-color:rgba(58,125,68,.4);color:var(--green)}
+.avail-dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+.avail-toggle.on .avail-dot{animation:blink 1.8s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* FILTERS */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.filter-btn{padding:6px 16px;border-radius:99px;font:500 12px 'Inter',sans-serif;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);transition:all .16s;box-shadow:var(--shadow)}
+.filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(194,98,63,.08);font-weight:600}
+
+/* EMPTY */
+.empty{text-align:center;padding:52px 24px;color:var(--muted)}
+.empty-icon{font-size:40px;margin-bottom:12px;animation:float 3s ease-in-out infinite;display:block}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* GIGS */
+.gig-packages{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:12px 0}
+.gig-pkg{border:1.5px solid var(--border);border-radius:var(--r-sm);padding:14px;cursor:pointer;transition:all .18s;background:var(--surface2)}
+.gig-pkg:hover,.gig-pkg.selected{border-color:var(--accent);background:rgba(194,98,63,.06)}
+.gig-pkg-name{font-weight:700;font-size:13px;margin-bottom:4px}
+.gig-pkg-price{font-size:18px;font-weight:800;color:var(--accent)}
+.gig-pkg-desc{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* QUIZ */
+.quiz-opt{padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;margin-bottom:8px;transition:all .15s;font-size:13px;background:var(--surface2)}
+.quiz-opt:hover{border-color:var(--accent)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(58,125,68,.1);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(192,57,43,.1);color:var(--red)}
+.quiz-progress{height:4px;background:var(--surface2);border-radius:2px;margin-bottom:16px;overflow:hidden}
+.quiz-progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease}
+
+/* CLIENT PROFILE POPUP */
+.client-popup-ava{width:70px;height:70px;border-radius:16px;background:linear-gradient(135deg,var(--blue),var(--accent));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;overflow:hidden;flex-shrink:0}
+.info-row{display:flex;gap:8px;margin-bottom:8px;font-size:13px;align-items:center}
+.info-row .info-icon{width:20px;text-align:center;color:var(--muted)}
+
+/* PAYMENT */
+.payment-method-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.pay-opt{border:1.5px solid var(--border);border-radius:var(--r-sm);padding:14px;cursor:pointer;transition:all .18s;background:var(--surface2);text-align:center}
+.pay-opt:hover,.pay-opt.selected{border-color:var(--accent);background:rgba(194,98,63,.06)}
+.pay-opt-icon{font-size:24px;margin-bottom:6px}
+.pay-opt-name{font-weight:700;font-size:13px}
+.pay-opt-sub{font-size:11px;color:var(--muted)}
+
+/* VERIFICATION SECTION */
+.verif-item{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)}
+.verif-item:last-child{border-bottom:none}
+.verif-label{font-weight:600;font-size:13px}
+.verif-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.verif-status{font-size:20px}
+
+/* LEVEL BADGE */
+.level-new{color:var(--muted)}
+.level-rising{color:var(--blue)}
+.level-top{color:var(--amber)}
+
+/* SOS */
+.sos-btn{background:var(--red);color:#fff;border:none;border-radius:99px;padding:10px 20px;font:700 13px 'Inter',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:8px;animation:sosPulse 2s ease-in-out infinite;box-shadow:0 0 0 0 rgba(192,57,43,.4)}
+@keyframes sosPulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.3)}50%{box-shadow:0 0 0 10px transparent}}
+
+/* TRAVEL FEE */
+.travel-info{background:rgba(192,139,42,.1);border:1px solid rgba(192,139,42,.3);border-radius:var(--r-sm);padding:12px;font-size:13px;margin:10px 0}
+
+/* PRO SIDEBAR */
+.pro-dash .sidebar{background:#fdf8ef;border-color:#e0ceaa}
+.pro-dash .sidebar-logo,.pro-dash .sidebar-user,.pro-dash .sidebar-foot{border-color:#e0ceaa}
+.pro-dash .s-ava{border-color:var(--amber)}
+.pro-dash .page-hd{background:#fdf8ef}
+
+@media(max-width:700px){
+  .sidebar{width:56px;min-width:56px}
+  .s-name,.s-role,.nav-item span:not(.nav-icon),.sidebar-logo .logo-text{display:none}
+  .nav-item{justify-content:center}
+  .content,.page-hd{padding-left:14px;padding-right:14px}
+  .form-row{grid-template-columns:1fr}
+  .pro-grid{grid-template-columns:1fr 1fr}
+  .land-nav{padding:14px 20px}
+  .features{padding:0 16px 60px}
+  .gig-packages{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="toast-area" id="toasts"></div>
+
+<!-- LANDING -->
+<div id="screen-landing">
+  <nav class="land-nav">
+    <div class="logo">Skill<span>Con</span></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" onclick="showAuth('login')">Log In</button>
+      <button class="btn btn-primary" onclick="showAuth('register')">Get Started</button>
+    </div>
+  </nav>
+  <div class="land-hero">
+    <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:99px;background:rgba(194,98,63,.1);border:1px solid rgba(194,98,63,.3);font-size:13px;color:var(--accent);margin-bottom:24px">🔗 India's trusted skill marketplace</div>
+    <h1>Find <em>skilled professionals</em><br/>near you, instantly</h1>
+    <p>Connect with verified local professionals — plumbers, electricians, designers & 80+ more. OTP-verified, safe & transparent.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" style="padding:14px 28px;font-size:15px" onclick="showAuth('register','client')">I need a service</button>
+      <button class="btn btn-ghost" style="padding:14px 28px;font-size:15px" onclick="showAuth('register','professional')">I offer services</button>
+    </div>
+  </div>
+  <div class="features">
+    <div class="feat"><div class="feat-icon" style="background:rgba(194,98,63,.12)">🔐</div><h3>OTP Verified Jobs</h3><p>Completion & review both verified with one-time codes.</p></div>
+    <div class="feat"><div class="feat-icon" style="background:rgba(58,125,68,.12)">✅</div><h3>ID Verified Pros</h3><p>Aadhaar upload + skill quiz + work proof = trusted badge.</p></div>
+    <div class="feat"><div class="feat-icon" style="background:rgba(46,109,164,.12)">📍</div><h3>Distance Pricing</h3><p>Fair travel fee auto-calculated based on how far the pro is.</p></div>
+    <div class="feat"><div class="feat-icon" style="background:rgba(192,139,42,.12)">💰</div><h3>Flexible Packages</h3><p>Basic, Standard & Premium — pick what fits your budget.</p></div>
+    <div class="feat"><div class="feat-icon" style="background:rgba(192,57,43,.12)">🆘</div><h3>SOS Safety</h3><p>One-tap SOS shares worker details with your emergency contact.</p></div>
+    <div class="feat"><div class="feat-icon" style="background:rgba(139,92,246,.12)">💬</div><h3>Job Messaging</h3><p>Chat directly per job. Share OTPs safely in the thread.</p></div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="screen-auth" class="hidden">
+  <div class="auth-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div class="logo" style="font-size:20px">Skill<span>Con</span></div>
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('landing')">← Back</button>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="authTab('login')">Log In</button>
+      <button class="auth-tab" id="tab-register" onclick="authTab('register')">Register</button>
+    </div>
+    <div id="form-login">
+      <div class="form-group"><label>Email</label><input id="li-email" type="email" placeholder="you@example.com"/></div>
+      <div class="form-group"><label>Password</label><input id="li-pass" type="password" placeholder="••••••••"/></div>
+      <div class="err-msg" id="li-err"></div>
+      <button class="btn btn-primary btn-full" style="margin-top:8px" onclick="doLogin()">Log In</button>
+      <div style="font-size:12px;color:var(--muted);text-align:center;margin-top:12px">Demo: client@demo.com / demo123 &nbsp;|&nbsp; pro@demo.com / demo123</div>
+    </div>
+    <div id="form-register" class="hidden">
+      <div class="role-row">
+        <div class="role-opt active-client" id="role-client" onclick="pickRole('client')">👤 Client<br><span style="font-size:11px;font-weight:400">I need services</span></div>
+        <div class="role-opt" id="role-pro" onclick="pickRole('professional')">🔧 Professional<br><span style="font-size:11px;font-weight:400">I offer skills</span></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name</label><input id="reg-name" placeholder="Ravi Kumar"/></div>
+        <div class="form-group"><label>Phone</label><input id="reg-phone" placeholder="9876543210"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Age</label><input id="reg-age" type="number" placeholder="25"/></div>
+        <div class="form-group"><label>Gender</label>
+          <select id="reg-gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>City</label><input id="reg-city" placeholder="Mumbai"/></div>
+      <div class="form-group"><label>Email</label><input id="reg-email" type="email" placeholder="you@example.com"/></div>
+      <div class="form-group"><label>Password</label><input id="reg-pass" type="password" placeholder="Min 6 characters"/></div>
+      <div class="err-msg" id="reg-err"></div>
+      <button class="btn btn-primary btn-full" style="margin-top:8px" onclick="doRegister()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT DASHBOARD -->
+<div id="screen-client" class="hidden">
+  <div class="dash">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo">Skill<span>Con</span></div></div>
+      <div class="sidebar-user">
+        <div class="s-ava" id="cl-s-ava">C</div>
+        <div><div class="s-name" id="cl-s-name">Client</div><div class="s-role">Client</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" onclick="clNav('home',this)"><span class="nav-icon">🏠</span><span>Home</span></button>
+        <button class="nav-item" onclick="clNav('browse',this)"><span class="nav-icon">🔍</span><span>Find Pros</span></button>
+        <button class="nav-item" onclick="clNav('jobs',this)"><span class="nav-icon">📋</span><span>My Jobs</span></button>
+        <button class="nav-item" onclick="clNav('saved',this)"><span class="nav-icon">❤️</span><span>Saved</span></button>
+        <button class="nav-item" onclick="clNav('transactions',this)"><span class="nav-icon">💳</span><span>Payments</span></button>
+        <button class="nav-item" onclick="clNav('profile',this)"><span class="nav-icon">👤</span><span>Profile</span></button>
+      </nav>
+      <div class="sidebar-foot"><button class="btn btn-red btn-sm btn-full" onclick="logout()">Log Out</button></div>
+    </aside>
+    <main class="main">
+      <div id="cl-home">
+        <div class="page-hd"><h2 id="cl-greeting">Welcome!</h2><p>Your job overview</p></div>
+        <div class="content">
+          <div class="stats-row" id="cl-stats"></div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:12px">Recent Jobs</div>
+          <div class="job-list" id="cl-recent-jobs"><div class="empty"><span class="empty-icon">📭</span><p>No jobs yet</p></div></div>
+        </div>
+      </div>
+      <div id="cl-browse" class="hidden">
+        <div class="page-hd"><h2>Find Professionals</h2><p>Discover skilled workers near you</p></div>
+        <div class="content">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+            <input id="cl-q" placeholder="🔍 Search name, skill, category…" style="max-width:220px" oninput="searchPros()"/>
+            <select id="cl-cat" onchange="searchPros()" style="max-width:180px">
+              <option value="">All categories</option>
+            </select>
+            <select id="cl-sort" onchange="searchPros()" style="max-width:150px">
+              <option value="rating">Best Rated</option>
+              <option value="price">Lowest Price</option>
+            </select>
+            <select id="cl-rating" onchange="searchPros()" style="max-width:140px">
+              <option value="">Any Rating</option>
+              <option value="3">3+ ⭐</option>
+              <option value="4">4+ ⭐</option>
+              <option value="4.5">4.5+ ⭐</option>
+            </select>
+          </div>
+          <div class="pro-grid" id="cl-pro-grid"><div class="empty" style="grid-column:1/-1"><span class="empty-icon">🔄</span><p>Loading…</p></div></div>
+        </div>
+      </div>
+      <div id="cl-jobs" class="hidden">
+        <div class="page-hd"><h2>My Jobs</h2><p>Track all your service requests</p></div>
+        <div class="content">
+          <div class="filter-row">
+            <button class="filter-btn active" onclick="filterClJobs('all',this)">All</button>
+            <button class="filter-btn" onclick="filterClJobs('assigned',this)">New</button>
+            <button class="filter-btn" onclick="filterClJobs('accepted',this)">Active</button>
+            <button class="filter-btn" onclick="filterClJobs('awaiting_review',this)">Awaiting Review</button>
+            <button class="filter-btn" onclick="filterClJobs('completed',this)">Completed</button>
+          </div>
+          <div class="job-list" id="cl-jobs-list"></div>
+        </div>
+      </div>
+      <div id="cl-saved" class="hidden">
+        <div class="page-hd"><h2>Saved Professionals</h2><p>Your favourite workers</p></div>
+        <div class="content"><div class="pro-grid" id="cl-saved-grid"></div></div>
+      </div>
+      <div id="cl-transactions" class="hidden">
+        <div class="page-hd"><h2>Payment History</h2><p>All your transactions</p></div>
+        <div class="content" id="cl-txn-list"></div>
+      </div>
+      <div id="cl-profile" class="hidden">
+        <div class="page-hd"><h2>My Profile</h2><p>Manage your account</p></div>
+        <div class="content">
+          <div class="card" style="max-width:480px">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+              <div class="ava-wrap" onclick="document.getElementById('cl-ava-input').click()">
+                <div class="ava-lg" id="cl-ava-lg">C</div>
+                <div class="ava-overlay">📷</div>
+                <input type="file" id="cl-ava-input" accept="image/*" style="display:none" onchange="uploadAva(this,'client')"/>
+              </div>
+              <div><div style="font-weight:700;font-size:16px" id="cl-profile-name">—</div><div style="font-size:12px;color:var(--muted)" id="cl-profile-info">—</div></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Name</label><input id="cl-edit-name" placeholder="Your name"/></div>
+              <div class="form-group"><label>Phone</label><input id="cl-edit-phone" placeholder="Phone"/></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Age</label><input id="cl-edit-age" type="number" placeholder="Age"/></div>
+              <div class="form-group"><label>Gender</label>
+                <select id="cl-edit-gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option></select>
+              </div>
+            </div>
+            <div class="form-group"><label>City</label><input id="cl-edit-city" placeholder="City"/></div>
+            <button class="btn btn-primary btn-full" onclick="saveClientProfile()">💾 Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PRO DASHBOARD -->
+<div id="screen-pro" class="hidden">
+  <div class="dash pro-dash">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo">Skill<span>Con</span></div></div>
+      <div class="sidebar-user">
+        <div class="s-ava" id="pro-s-ava" style="border-color:var(--amber)">P</div>
+        <div><div class="s-name" id="pro-s-name">Pro</div><div class="s-role" style="color:var(--amber)">Professional</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item" onclick="proNav('home',this)"><span class="nav-icon">📊</span><span>Dashboard</span></button>
+        <button class="nav-item" onclick="proNav('jobs',this)"><span class="nav-icon">🔨</span><span>My Jobs</span></button>
+        <button class="nav-item" onclick="proNav('portfolio',this)"><span class="nav-icon">🖼️</span><span>Portfolio</span></button>
+        <button class="nav-item" onclick="proNav('verify',this)"><span class="nav-icon">✅</span><span>Verification</span></button>
+        <button class="nav-item" onclick="proNav('profile',this)"><span class="nav-icon">👤</span><span>Profile</span></button>
+        <button class="nav-item" onclick="proNav('transactions',this)"><span class="nav-icon">💳</span><span>Earnings</span></button>
+      </nav>
+      <div class="sidebar-foot" style="border-color:#e0ceaa"><button class="btn btn-red btn-sm btn-full" onclick="logout()">Log Out</button></div>
+    </aside>
+    <main class="main">
+      <div id="pro-home">
+        <div class="page-hd"><h2 id="pro-greeting" style="color:var(--amber)">Dashboard</h2><p>Manage your jobs and earnings</p></div>
+        <div class="content">
+          <div id="pro-avail-wrap" style="margin-bottom:16px"></div>
+          <div class="stats-row" id="pro-stats"></div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:12px">📥 New Requests</div>
+          <div class="job-list" id="pro-new-jobs"><div class="empty"><span class="empty-icon">✅</span><p>No new requests</p></div></div>
+          <div style="font-weight:700;font-size:14px;margin:20px 0 12px">🔨 Active Jobs</div>
+          <div class="job-list" id="pro-active-jobs"><div class="empty"><span class="empty-icon">🔨</span><p>No active jobs</p></div></div>
+          <div style="font-weight:700;font-size:14px;margin:20px 0 12px">🔑 Review Requested</div>
+          <div class="job-list" id="pro-review-jobs"><div class="empty"><span class="empty-icon">⭐</span><p>None pending</p></div></div>
+        </div>
+      </div>
+      <div id="pro-jobs" class="hidden">
+        <div class="page-hd"><h2 style="color:var(--amber)">All Jobs</h2><p>Complete history</p></div>
+        <div class="content">
+          <div class="filter-row">
+            <button class="filter-btn active" onclick="filterProJobs('all',this)">All</button>
+            <button class="filter-btn" onclick="filterProJobs('assigned',this)">New</button>
+            <button class="filter-btn" onclick="filterProJobs('accepted',this)">Active</button>
+            <button class="filter-btn" onclick="filterProJobs('awaiting_review',this)">Awaiting Review</button>
+            <button class="filter-btn" onclick="filterProJobs('completed',this)">Completed</button>
+          </div>
+          <div class="job-list" id="pro-jobs-list"></div>
+        </div>
+      </div>
+      <div id="pro-portfolio" class="hidden">
+        <div class="page-hd"><h2 style="color:var(--amber)">Portfolio</h2><p>Showcase your work</p></div>
+        <div class="content">
+          <label style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--amber);color:#fff;font-weight:700;font-size:13px;border-radius:var(--r-sm);cursor:pointer;margin-bottom:16px;box-shadow:var(--shadow)">
+            📤 Upload Work Photo
+            <input type="file" accept="image/*" multiple style="display:none" onchange="uploadPortfolio(this)"/>
+          </label>
+          <div class="port-grid" id="pro-port-grid"><div class="empty" style="grid-column:1/-1"><span class="empty-icon">🖼️</span><p>No photos yet</p></div></div>
+        </div>
+      </div>
+      <div id="pro-verify" class="hidden">
+        <div class="page-hd"><h2 style="color:var(--amber)">Verification</h2><p>Build trust with clients — all optional, more = better badge</p></div>
+        <div class="content" style="max-width:600px">
+          <div class="card" style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+              <div id="verif-badge-display" style="font-size:32px">🔓</div>
+              <div><div style="font-weight:700;font-size:16px" id="verif-level-text">Unverified</div><div style="font-size:12px;color:var(--muted)">Complete more items to upgrade your badge</div></div>
+            </div>
+            <div id="verif-items">
+              <div class="verif-item">
+                <div><div class="verif-label">🪪 Aadhaar Card</div><div class="verif-sub">Upload a photo of your Aadhaar card</div></div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span id="vi-aadhaar">❌</span>
+                  <label style="cursor:pointer;font-size:12px;color:var(--accent);font-weight:600">Upload<input type="file" accept="image/*" style="display:none" onchange="uploadAadhaar(this)"/></label>
+                </div>
+              </div>
+              <div class="verif-item">
+                <div><div class="verif-label">📸 Work Proof</div><div class="verif-sub">Photos of your past work (certificates, job photos)</div></div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span id="vi-proof">❌</span>
+                  <label style="cursor:pointer;font-size:12px;color:var(--accent);font-weight:600">Upload<input type="file" accept="image/*" style="display:none" onchange="uploadWorkProof(this)"/></label>
+                </div>
+              </div>
+              <div class="verif-item">
+                <div><div class="verif-label">🧠 Skill Quiz</div><div class="verif-sub">5 questions about your trade to prove your knowledge</div></div>
+                <div><span id="vi-quiz">❌</span> <button class="btn btn-ghost btn-sm" onclick="startQuiz()" id="quiz-btn">Take Quiz</button></div>
+              </div>
+              <div class="verif-item">
+                <div><div class="verif-label">👥 References</div><div class="verif-sub">Past clients who can vouch for your work</div></div>
+                <div><span id="vi-refs">❌</span></div>
+              </div>
+              <div class="verif-item">
+                <div><div class="verif-label">🆘 Emergency Contact</div><div class="verif-sub">Contact person in case of emergency</div></div>
+                <div><span id="vi-emergency">❌</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:14px">Additional Details</div>
+            <div class="form-row">
+              <div class="form-group"><label>Years of Experience</label><input id="vi-years" type="number" placeholder="5"/></div>
+              <div class="form-group"><label>Emergency Contact</label><input id="vi-emg" placeholder="Name: Phone"/></div>
+            </div>
+            <div class="form-group"><label>References (past clients)</label><textarea id="vi-ref-text" placeholder="Client name: Phone number&#10;Client name: Phone number"></textarea></div>
+            <button class="btn btn-amber btn-full" onclick="saveVerifDetails()">💾 Save Details</button>
+          </div>
+        </div>
+      </div>
+      <div id="pro-profile" class="hidden">
+        <div class="page-hd"><h2 style="color:var(--amber)">My Profile</h2><p>Update your details & gig packages</p></div>
+        <div class="content" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px">
+          <div class="card" style="background:#fdf8ef;border-color:#e0ceaa">
+            <div style="font-weight:700;margin-bottom:14px">Profile Picture</div>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+              <div class="ava-wrap" onclick="document.getElementById('pro-ava-input').click()">
+                <div class="ava-lg" id="pro-ava-lg" style="border-color:var(--amber)">P</div>
+                <div class="ava-overlay">📷</div>
+                <input type="file" id="pro-ava-input" accept="image/*" style="display:none" onchange="uploadAva(this,'pro')"/>
+              </div>
+              <div>
+                <div style="font-weight:700" id="pro-profile-name">—</div>
+                <div style="font-size:12px;color:var(--amber)" id="pro-profile-cat">—</div>
+                <div id="pro-profile-level" style="font-size:11px;margin-top:4px"></div>
+              </div>
+            </div>
+            <div class="form-group"><label>Category</label>
+              <select id="pro-cat" style="border-color:#e0ceaa"><option value="">Choose…</option></select>
+            </div>
+            <div id="pro-custom-cat-wrap" class="form-group hidden"><label>Custom Profession</label><input id="pro-custom-cat" placeholder="Enter your profession"/></div>
+            <div class="form-group"><label>Bio</label><textarea id="pro-bio" style="border-color:#e0ceaa" placeholder="Describe your experience…"></textarea></div>
+            <div class="form-group"><label>Skills (comma separated)</label><input id="pro-skills" style="border-color:#e0ceaa" placeholder="pipe fitting, leak repair"/></div>
+            <div class="form-row">
+              <div class="form-group"><label>Hourly Rate (₹)</label><input id="pro-rate" type="number" style="border-color:#e0ceaa"/></div>
+              <div class="form-group"><label>Years Experience</label><input id="pro-exp" type="number" style="border-color:#e0ceaa"/></div>
+            </div>
+            <button class="btn btn-amber btn-full" onclick="saveProProfile()">💾 Save Profile</button>
+          </div>
+          <div class="card" style="background:#fdf8ef;border-color:#e0ceaa">
+            <div style="font-weight:700;margin-bottom:14px">Gig Packages</div>
+            <div class="form-group"><label>Gig Title</label><input id="gig-title" style="border-color:#e0ceaa" placeholder="What I offer…"/></div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Set your package prices & descriptions</div>
+            <div style="background:rgba(194,98,63,.06);border:1px solid rgba(194,98,63,.2);border-radius:var(--r-sm);padding:14px;margin-bottom:10px">
+              <div style="font-weight:700;font-size:13px;color:var(--accent);margin-bottom:8px">Basic</div>
+              <div class="form-row">
+                <div class="form-group"><label>Price (₹)</label><input id="gig-b-price" type="number" style="border-color:#e0ceaa"/></div>
+                <div class="form-group"><label>Description</label><input id="gig-b-desc" style="border-color:#e0ceaa" placeholder="Quick fix"/></div>
+              </div>
+            </div>
+            <div style="background:rgba(46,109,164,.06);border:1px solid rgba(46,109,164,.2);border-radius:var(--r-sm);padding:14px;margin-bottom:10px">
+              <div style="font-weight:700;font-size:13px;color:var(--blue);margin-bottom:8px">Standard</div>
+              <div class="form-row">
+                <div class="form-group"><label>Price (₹)</label><input id="gig-s-price" type="number" style="border-color:#e0ceaa"/></div>
+                <div class="form-group"><label>Description</label><input id="gig-s-desc" style="border-color:#e0ceaa" placeholder="Full service"/></div>
+              </div>
+            </div>
+            <div style="background:rgba(192,139,42,.06);border:1px solid rgba(192,139,42,.2);border-radius:var(--r-sm);padding:14px;margin-bottom:10px">
+              <div style="font-weight:700;font-size:13px;color:var(--amber);margin-bottom:8px">Premium</div>
+              <div class="form-row">
+                <div class="form-group"><label>Price (₹)</label><input id="gig-p-price" type="number" style="border-color:#e0ceaa"/></div>
+                <div class="form-group"><label>Description</label><input id="gig-p-desc" style="border-color:#e0ceaa" placeholder="Complete overhaul"/></div>
+              </div>
+            </div>
+            <button class="btn btn-amber btn-full" onclick="saveProProfile()">💾 Save Packages</button>
+          </div>
+        </div>
+      </div>
+      <div id="pro-transactions" class="hidden">
+        <div class="page-hd"><h2 style="color:var(--amber)">Earnings</h2><p>Your payment history</p></div>
+        <div class="content" id="pro-txn-list"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- MODALS -->
+
+<!-- Pro Detail + Book -->
+<div class="overlay hidden" id="modal-pro">
+  <div class="modal modal-wide">
+    <div class="modal-hd"><h3 id="mpro-name">Professional</h3><button class="x-btn" onclick="closeModal('modal-pro')">✕</button></div>
+    <div id="mpro-body"></div>
+  </div>
+</div>
+
+<!-- Job Created OTP -->
+<div class="overlay hidden" id="modal-job-otp">
+  <div class="modal" style="max-width:400px;text-align:center">
+    <div class="modal-hd"><h3>Job Assigned! 🎉</h3><button class="x-btn" onclick="closeModal('modal-job-otp')">✕</button></div>
+    <p style="color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:4px">Share this <strong style="color:var(--text)">Completion OTP</strong> with the professional <em>when the work is done</em>. They enter it to mark the job complete.</p>
+    <div class="otp-box" id="job-otp-val">------</div>
+    <div class="travel-info" id="job-travel-info" style="display:none"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:8px" onclick="closeModal('modal-job-otp')">Got it!</button>
+  </div>
+</div>
+
+<!-- Client Profile Popup (for professional) -->
+<div class="overlay hidden" id="modal-client-profile">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-hd"><h3>Client Details</h3><button class="x-btn" onclick="closeModal('modal-client-profile')">✕</button></div>
+    <div id="modal-client-body"></div>
+  </div>
+</div>
+
+<!-- Complete Job OTP (pro enters) -->
+<div class="overlay hidden" id="modal-complete">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-hd"><h3>Mark Job Complete</h3><button class="x-btn" onclick="closeModal('modal-complete')">✕</button></div>
+    <input type="hidden" id="complete-jid"/>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:14px">Ask the client for their <strong style="color:var(--text)">6-digit Completion OTP</strong> and enter it below.</p>
+    <div class="form-group"><label>Completion OTP (from client)</label><input id="complete-otp-inp" placeholder="••••••" maxlength="6" style="font-size:24px;text-align:center;letter-spacing:8px"/></div>
+    <div class="err-msg" id="complete-err"></div>
+    <button class="btn btn-green btn-full" style="margin-top:8px" onclick="submitCompleteOTP()">✅ Confirm Completion</button>
+  </div>
+</div>
+
+<!-- Review OTP shown to pro -->
+<div class="overlay hidden" id="modal-show-rev-otp">
+  <div class="modal" style="max-width:400px;text-align:center">
+    <div class="modal-hd"><h3>Review OTP 🔑</h3><button class="x-btn" onclick="closeModal('modal-show-rev-otp')">✕</button></div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:4px">The client wants to review. Share this OTP with them via the job message thread.</p>
+    <div class="otp-box" id="rev-otp-show">------</div>
+    <button class="btn btn-primary btn-sm" onclick="openMsgs(currentRevOTPJobId)" style="margin-top:8px">💬 Open Messages</button>
+  </div>
+</div>
+
+<!-- Review Modal (client) -->
+<div class="overlay hidden" id="modal-review">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-hd"><h3>Leave a Review ⭐</h3><button class="x-btn" onclick="closeModal('modal-review')">✕</button></div>
+    <input type="hidden" id="rev-jid"/>
+    <div id="rev-otp-step">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:14px">Ask the professional for their <strong style="color:var(--text)">Review OTP</strong> (via job messages) and enter it here.</p>
+      <div class="form-group"><label>Review OTP (from professional)</label><input id="rev-otp-inp" placeholder="••••••" maxlength="6" style="font-size:24px;text-align:center;letter-spacing:8px"/></div>
+      <div class="err-msg" id="rev-otp-err"></div>
+      <button class="btn btn-primary btn-full" style="margin-top:8px" onclick="verifyRevOTP()">Verify OTP →</button>
+    </div>
+    <div id="rev-form-step" class="hidden">
+      <div class="form-group">
+        <label>Your Rating</label>
+        <div style="display:flex;gap:8px;margin-bottom:14px" id="star-row">
+          <span style="font-size:28px;cursor:pointer;filter:grayscale(1);transition:all .15s" onclick="setStar(1)">⭐</span>
+          <span style="font-size:28px;cursor:pointer;filter:grayscale(1);transition:all .15s" onclick="setStar(2)">⭐</span>
+          <span style="font-size:28px;cursor:pointer;filter:grayscale(1);transition:all .15s" onclick="setStar(3)">⭐</span>
+          <span style="font-size:28px;cursor:pointer;filter:grayscale(1);transition:all .15s" onclick="setStar(4)">⭐</span>
+          <span style="font-size:28px;cursor:pointer;filter:grayscale(1);transition:all .15s" onclick="setStar(5)">⭐</span>
+        </div>
+      </div>
+      <div class="form-group"><label>Comment</label><textarea id="rev-comment" placeholder="How was the service?"></textarea></div>
+      <div class="err-msg" id="rev-form-err"></div>
+      <button class="btn btn-primary btn-full" onclick="submitReview()">Submit Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- Messages -->
+<div class="overlay hidden" id="modal-msgs">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-hd"><h3 id="msgs-title">Messages</h3><button class="x-btn" onclick="closeModal('modal-msgs')">✕</button></div>
+    <input type="hidden" id="msgs-jid"/>
+    <div class="msg-area" id="msg-area"></div>
+    <div class="msg-input-row">
+      <input id="msg-inp" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMsg()"/>
+      <button class="btn btn-primary btn-sm" onclick="sendMsg()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="overlay hidden" id="modal-payment">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-hd"><h3>Payment</h3><button class="x-btn" onclick="closeModal('modal-payment')">✕</button></div>
+    <div id="payment-summary" style="background:var(--surface2);border-radius:var(--r-sm);padding:14px;margin-bottom:16px;font-size:13px"></div>
+    <div class="payment-method-row">
+      <div class="pay-opt selected" id="pay-cash" onclick="selectPayMethod('cash')">
+        <div class="pay-opt-icon">💵</div>
+        <div class="pay-opt-name">Cash</div>
+        <div class="pay-opt-sub">Pay after work</div>
+      </div>
+      <div class="pay-opt" id="pay-online" onclick="selectPayMethod('online')">
+        <div class="pay-opt-icon">📱</div>
+        <div class="pay-opt-name">Online</div>
+        <div class="pay-opt-sub">UPI / GPay / Card</div>
+      </div>
+    </div>
+    <div id="online-pay-section" class="hidden" style="margin-top:12px">
+      <div style="background:rgba(46,109,164,.08);border:1px solid rgba(46,109,164,.2);border-radius:var(--r-sm);padding:14px;font-size:13px;margin-bottom:10px">
+        <div style="font-weight:700;margin-bottom:8px">Pay via UPI</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <span style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer" onclick="toast('Redirecting to GPay…','info')">📱 GPay</span>
+          <span style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer" onclick="toast('Redirecting to PhonePe…','info')">💜 PhonePe</span>
+          <span style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer" onclick="toast('Opening UPI…','info')">🔵 Paytm</span>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted)">⚠️ Demo mode — Razorpay integration ready. Add API keys to go live.</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" style="margin-top:8px" onclick="confirmBooking()">Confirm Booking</button>
+  </div>
+</div>
+
+<!-- Quiz Modal -->
+<div class="overlay hidden" id="modal-quiz">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-hd"><h3>Skill Quiz 🧠</h3><button class="x-btn" onclick="closeModal('modal-quiz')">✕</button></div>
+    <div id="quiz-body"></div>
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8000/api';
+let token = localStorage.getItem('sc_token');
+let me = null, allPros = [], clJobs = [], proJobs = [];
+let selStar = 0, selRole = 'client', selPkg = 'basic', selPayMethod = 'cash';
+let pendingBooking = null, currentRevOTPJobId = null;
+let quizQs = [], quizIdx = 0, quizScore = 0, quizAnswered = false;
+
+// ── CORE ──────────────────────────────────────────────────────
+async function api(method, path, body, isForm) {
+  const opts = {method, headers: {}};
+  if (token) opts.headers['Authorization'] = `Bearer ${token}`;
+  if (body && !isForm) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  else if (body) opts.body = body;
+  const r = await fetch(API + path, opts);
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.detail || 'Request failed');
+  return d;
+}
+
+function toast(msg, type='ok') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.textContent = msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function showScreen(id) {
+  ['landing','auth','client','pro'].forEach(s => document.getElementById(`screen-${s}`).classList.add('hidden'));
+  document.getElementById(`screen-${id}`).classList.remove('hidden');
+}
+
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function setAva(elId, url, name) {
+  const el = document.getElementById(elId); if (!el) return;
+  if (url) el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"/>`;
+  else el.textContent = (name||'?')[0].toUpperCase();
+}
+
+function stars(n, total=5) {
+  return '★'.repeat(Math.round(n||0)) + '☆'.repeat(total - Math.round(n||0));
+}
+
+function fmtDate(dt) { return dt ? new Date(dt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—'; }
+function fmtStatus(s) { return {assigned:'New Request',accepted:'Active',awaiting_review:'Awaiting Review',completed:'Completed'}[s]||s; }
+function verifBadge(v) {
+  if (v==='verified') return '<span class="badge badge-verified">✅ Verified</span>';
+  if (v==='partial') return '<span class="badge badge-partial">⚡ Partially Verified</span>';
+  return '<span class="badge badge-unverified">○ Unverified</span>';
+}
+function levelBadge(l) {
+  if (l==='Top Rated') return '<span class="badge badge-top">🏆 Top Rated</span>';
+  if (l==='Rising') return '<span style="font-size:11px;font-weight:600;color:var(--blue)">📈 Rising</span>';
+  return '<span style="font-size:11px;color:var(--muted)">🆕 New</span>';
+}
+
+// ── AUTH ──────────────────────────────────────────────────────
+function showAuth(tab, role) { showScreen('auth'); authTab(tab||'login'); if(role) pickRole(role); }
+function authTab(t) {
+  document.getElementById('tab-login').classList.toggle('active',t==='login');
+  document.getElementById('tab-register').classList.toggle('active',t==='register');
+  document.getElementById('form-login').classList.toggle('hidden',t!=='login');
+  document.getElementById('form-register').classList.toggle('hidden',t!=='register');
+}
+function pickRole(r) {
+  selRole = r;
+  document.getElementById('role-client').className = 'role-opt' + (r==='client'?' active-client':'');
+  document.getElementById('role-pro').className = 'role-opt' + (r==='professional'?' active-pro':'');
+}
+
+async function doLogin() {
+  const email = document.getElementById('li-email').value.trim();
+  const pass = document.getElementById('li-pass').value;
+  document.getElementById('li-err').textContent = '';
+  try {
+    const d = await api('POST','/login',{email,password:pass});
+    token = d.token; localStorage.setItem('sc_token',token);
+    await initDash();
+  } catch(e) { document.getElementById('li-err').textContent = e.message; }
+}
+
+async function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const phone = document.getElementById('reg-phone').value.trim();
+  const age = parseInt(document.getElementById('reg-age').value)||null;
+  const gender = document.getElementById('reg-gender').value;
+  const city = document.getElementById('reg-city').value.trim();
+  document.getElementById('reg-err').textContent = '';
+  if (!name||!email||!pass) { document.getElementById('reg-err').textContent='Fill required fields'; return; }
+  try {
+    const d = await api('POST','/register',{name,email,password:pass,role:selRole,phone,age,gender,city});
+    token = d.token; localStorage.setItem('sc_token',token);
+    await initDash();
+  } catch(e) { document.getElementById('reg-err').textContent = e.message; }
+}
+
+function logout() { token=null; me=null; localStorage.removeItem('sc_token'); showScreen('landing'); }
+
+async function initDash() {
+  me = await api('GET','/me');
+  if (me.role==='professional') { setupProDash(); proNav('home'); }
+  else { setupClDash(); clNav('home'); }
+}
+
+// ── PROFESSIONS LOADER ────────────────────────────────────────
+async function loadProfessions() {
+  try {
+    const d = await api('GET','/professions');
+    const cats = d.professions || [];
+    ['cl-cat','pro-cat'].forEach(id => {
+      const el = document.getElementById(id); if (!el) return;
+      const base = id==='cl-cat' ? '<option value="">All categories</option>' : '<option value="">Choose…</option>';
+      el.innerHTML = base + cats.map(c=>`<option>${c}</option>`).join('');
+    });
+    if (document.getElementById('pro-cat')) {
+      document.getElementById('pro-cat').addEventListener('change', function() {
+        document.getElementById('pro-custom-cat-wrap').classList.toggle('hidden', this.value!=='Custom');
+      });
+    }
+  } catch(_){}
+}
+
+// ── CLIENT DASH ───────────────────────────────────────────────
+function setupClDash() {
+  showScreen('client');
+  document.getElementById('cl-s-name').textContent = me.name;
+  setAva('cl-s-ava', me.avatar, me.name);
+  setAva('cl-ava-lg', me.avatar, me.name);
+  document.getElementById('cl-profile-name').textContent = me.name;
+  document.getElementById('cl-profile-info').textContent = [me.city, me.age?me.age+'y':null, me.gender].filter(Boolean).join(' · ');
+  ['cl-edit-name','cl-edit-phone','cl-edit-age','cl-edit-gender','cl-edit-city'].forEach(id => {
+    const key = id.replace('cl-edit-','');
+    if (document.getElementById(id)) document.getElementById(id).value = me[key]||'';
+  });
+  loadProfessions();
+}
+
+function clNav(tab, btn) {
+  ['home','browse','jobs','saved','transactions','profile'].forEach(t => document.getElementById(`cl-${t}`).classList.toggle('hidden',t!==tab));
+  document.querySelectorAll('#screen-client .nav-item').forEach(n => n.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (tab==='home') loadClHome();
+  if (tab==='browse') loadBrowse();
+  if (tab==='jobs') loadClJobs();
+  if (tab==='saved') loadSaved();
+  if (tab==='transactions') loadTxns('cl-txn-list');
+}
+
+async function loadClHome() {
+  try {
+    clJobs = await api('GET','/jobs');
+    const total=clJobs.length, active=clJobs.filter(j=>j.status==='accepted').length;
+    const done=clJobs.filter(j=>j.status==='completed').length, await_r=clJobs.filter(j=>j.status==='awaiting_review').length;
+    document.getElementById('cl-stats').innerHTML=`
+      <div class="stat"><div class="stat-label">Total Jobs</div><div class="stat-val">${total}</div></div>
+      <div class="stat"><div class="stat-label">Active</div><div class="stat-val" style="color:var(--blue)">${active}</div></div>
+      <div class="stat"><div class="stat-label">Awaiting Review</div><div class="stat-val" style="color:var(--amber)">${await_r}</div></div>
+      <div class="stat"><div class="stat-label">Completed</div><div class="stat-val" style="color:var(--green)">${done}</div></div>`;
+    const el = document.getElementById('cl-recent-jobs');
+    el.innerHTML = clJobs.length ? clJobs.slice(0,5).map(j=>clJobCard(j)).join('') :
+      `<div class="empty"><span class="empty-icon">📭</span><p>No jobs yet. <a style="color:var(--accent);cursor:pointer" onclick="clNav('browse')">Find a professional →</a></p></div>`;
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function loadBrowse() {
+  try {
+    allPros = await api('GET','/professionals');
+    renderPros(allPros);
+  } catch(e) { toast(e.message,'err'); }
+}
+
+function searchPros() {
+  const q = document.getElementById('cl-q').value.toLowerCase();
+  const cat = document.getElementById('cl-cat').value;
+  const sort = document.getElementById('cl-sort').value;
+  const minR = parseFloat(document.getElementById('cl-rating').value)||0;
+  let list = allPros;
+  if (cat) list = list.filter(p=>p.category===cat||p.custom_category===cat);
+  if (q) list = list.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.skills||'').toLowerCase().includes(q)||(p.bio||'').toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q));
+  if (minR) list = list.filter(p=>(p.avg_rating||0)>=minR);
+  if (sort==='price') list.sort((a,b)=>(a.hourly_rate||0)-(b.hourly_rate||0));
+  else list.sort((a,b)=>(b.avg_rating||0)-(a.avg_rating||0));
+  renderPros(list);
+}
+
+function renderPros(list) {
+  const g = document.getElementById('cl-pro-grid');
+  if (!list.length) { g.innerHTML=`<div class="empty" style="grid-column:1/-1"><span class="empty-icon">🔍</span><p>No professionals found</p></div>`; return; }
+  g.innerHTML = list.map(p => {
+    const cat = p.custom_category && p.category==='Custom' ? p.custom_category : (p.category||'General');
+    const ava = p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:14px"/>` : (p.name||'?')[0].toUpperCase();
+    return `<div class="pcard" onclick="viewPro(${p.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div class="pcard-ava">${ava}</div>
+        <div style="text-align:right">${verifBadge(p.verification_level)}<br/>${levelBadge(p.level)}</div>
+      </div>
+      <div class="pcard-name">${p.name}</div>
+      <div class="pcard-cat">${cat}</div>
+      <div class="pcard-bio">${p.bio||'Available for hire'}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <span style="font-weight:700;color:var(--accent);font-size:13px">${p.hourly_rate?'₹'+p.hourly_rate+'/hr':'Rate TBD'}</span>
+        <span style="color:var(--amber);font-size:12px">${stars(p.avg_rating)} (${p.total_reviews||0})</span>
+      </div>
+      ${p.is_available ? '<div style="margin-top:8px;font-size:11px;color:var(--green);font-weight:600">● Available now</div>' : '<div style="margin-top:8px;font-size:11px;color:var(--muted)">○ Busy</div>'}
+    </div>`;
+  }).join('');
+}
+
+async function viewPro(uid) {
+  openModal('modal-pro');
+  document.getElementById('mpro-body').innerHTML = '<div class="empty"><span class="empty-icon">🔄</span><p>Loading…</p></div>';
+  try {
+    const p = await api('GET',`/professionals/${uid}`);
+    const cat = p.custom_category && p.category==='Custom' ? p.custom_category : (p.category||'General');
+    const ava = p.avatar ? `<img src="${p.avatar}" style="width:80px;height:80px;border-radius:14px;object-fit:cover"/>` :
+      `<div style="width:80px;height:80px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800">${(p.name||'?')[0]}</div>`;
+    const skillTags = (p.skills||'').split(',').filter(Boolean).map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('');
+    const portHtml = (p.portfolio||[]).map(pp=>`<div class="port-item"><img src="${pp.url}"/></div>`).join('');
+    const revHtml = (p.reviews||[]).map(r=>`
+      <div style="background:var(--surface2);border-radius:var(--r-sm);padding:10px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="color:var(--amber)">${stars(r.rating)}</span>
+          <span style="font-size:12px;color:var(--muted)">${r.client_name} · ${fmtDate(r.created_at)}</span>
+        </div>
+        <div style="font-size:13px">${r.comment||''}</div>
+      </div>`).join('');
+
+    // Gig packages
+    let pkgHtml = '';
+    if (p.gig_basic_price || p.gig_standard_price || p.gig_premium_price) {
+      pkgHtml = `<div style="font-weight:700;font-size:14px;margin-bottom:10px">Packages</div>
+      <div class="gig-packages" id="gig-pkg-row">
+        ${p.gig_basic_price?`<div class="gig-pkg selected" id="pkg-basic" onclick="selectPkg('basic')"><div class="gig-pkg-name">Basic</div><div class="gig-pkg-price">₹${p.gig_basic_price}</div><div class="gig-pkg-desc">${p.gig_basic_desc||''}</div></div>`:''}
+        ${p.gig_standard_price?`<div class="gig-pkg" id="pkg-standard" onclick="selectPkg('standard')"><div class="gig-pkg-name">Standard</div><div class="gig-pkg-price">₹${p.gig_standard_price}</div><div class="gig-pkg-desc">${p.gig_standard_desc||''}</div></div>`:''}
+        ${p.gig_premium_price?`<div class="gig-pkg" id="pkg-premium" onclick="selectPkg('premium')"><div class="gig-pkg-name">Premium</div><div class="gig-pkg-price">₹${p.gig_premium_price}</div><div class="gig-pkg-desc">${p.gig_premium_desc||''}</div></div>`:''}
+      </div>`;
+    }
+
+    document.getElementById('mpro-name').textContent = p.name;
+    document.getElementById('mpro-body').innerHTML = `
+      <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap">
+        ${ava}
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:17px">${p.name}</div>
+          <div style="color:var(--muted);font-size:13px">${cat} · ${p.city||''}</div>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">
+            ${p.hourly_rate?`<span style="font-weight:700;color:var(--accent)">₹${p.hourly_rate}/hr</span>`:''}
+            <span style="color:var(--amber);font-size:13px">${stars(p.avg_rating)} (${p.total_reviews||0})</span>
+            ${verifBadge(p.verification_level)} ${levelBadge(p.level)}
+            ${p.years_exp?`<span style="font-size:12px;color:var(--muted)">${p.years_exp}y exp</span>`:''}
+            ${p.is_available?'<span style="font-size:12px;color:var(--green);font-weight:600">● Available</span>':'<span style="font-size:12px;color:var(--muted)">○ Busy</span>'}
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleSave(${uid},this)">${p.is_saved?'❤️ Saved':'🤍 Save'}</button>
+      </div>
+      ${p.bio?`<p style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px">${p.bio}</p>`:''}
+      ${skillTags?`<div style="margin-bottom:14px">${skillTags}</div>`:''}
+      ${portHtml?`<div style="font-weight:700;font-size:14px;margin-bottom:8px">Portfolio</div><div class="port-grid" style="margin-bottom:16px">${portHtml}</div>`:''}
+      ${revHtml?`<div style="font-weight:700;font-size:14px;margin-bottom:8px">Reviews</div><div style="margin-bottom:16px">${revHtml}</div>`:''}
+      <div style="border-top:1.5px solid var(--border);padding-top:16px">
+        <div style="font-weight:700;margin-bottom:12px">Book This Professional</div>
+        ${pkgHtml}
+        <div class="form-group" style="margin-top:10px"><label>Job Title</label><input id="mpro-title" placeholder="What do you need done?"/></div>
+        <div class="form-group"><label>Description</label><textarea id="mpro-desc" placeholder="Any extra details…"></textarea></div>
+        <div class="err-msg" id="mpro-err"></div>
+        <button class="btn btn-primary btn-full" style="margin-top:4px" onclick="openPaymentModal(${uid})" ${!p.is_available?'disabled style="opacity:.5"':''}>
+          ${p.is_available?'📅 Book Now':'❌ Not Available'}
+        </button>
+      </div>`;
+    selPkg = 'basic';
+  } catch(e) { toast(e.message,'err'); closeModal('modal-pro'); }
+}
+
+function selectPkg(pkg) {
+  selPkg = pkg;
+  ['basic','standard','premium'].forEach(p => {
+    const el = document.getElementById(`pkg-${p}`);
+    if (el) el.classList.toggle('selected', p===pkg);
+  });
+}
+
+async function toggleSave(uid, btn) {
+  try {
+    const d = await api('POST',`/saved/${uid}`);
+    btn.textContent = d.saved ? '❤️ Saved' : '🤍 Save';
+    toast(d.saved ? 'Saved! ❤️' : 'Removed from saved');
+  } catch(e) { toast(e.message,'err'); }
+}
+
+let pendingProId = null;
+function openPaymentModal(uid) {
+  const title = document.getElementById('mpro-title')?.value.trim();
+  const desc = document.getElementById('mpro-desc')?.value.trim();
+  if (!title) { document.getElementById('mpro-err').textContent='Please enter a job title'; return; }
+  pendingProId = uid;
+  pendingBooking = {uid, title, desc};
+  selPayMethod = 'cash';
+  document.getElementById('pay-cash').classList.add('selected');
+  document.getElementById('pay-online').classList.remove('selected');
+  document.getElementById('online-pay-section').classList.add('hidden');
+  document.getElementById('payment-summary').innerHTML = `
+    <div style="font-weight:700;margin-bottom:8px">📋 Job Summary</div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>${title}</span><span style="font-weight:600">${selPkg} package</span></div>
+    <div style="font-size:12px;color:var(--muted)">Travel fee (if applicable) will be calculated based on your location.</div>`;
+  closeModal('modal-pro');
+  openModal('modal-payment');
+}
+
+function selectPayMethod(m) {
+  selPayMethod = m;
+  document.getElementById('pay-cash').classList.toggle('selected', m==='cash');
+  document.getElementById('pay-online').classList.toggle('selected', m==='online');
+  document.getElementById('online-pay-section').classList.toggle('hidden', m!=='online');
+}
+
+async function confirmBooking() {
+  if (!pendingBooking) return;
+  try {
+    let lat=null, lng=null;
+    try {
+      const pos = await new Promise((res,rej) => navigator.geolocation.getCurrentPosition(res,rej,{timeout:3000}));
+      lat=pos.coords.latitude; lng=pos.coords.longitude;
+    } catch(_) {}
+    const d = await api('POST','/jobs',{
+      professional_id: pendingBooking.uid, title: pendingBooking.title,
+      description: pendingBooking.desc, package: selPkg,
+      payment_method: selPayMethod, client_lat: lat, client_lng: lng
+    });
+    closeModal('modal-payment');
+    document.getElementById('job-otp-val').textContent = d.completion_otp;
+    const ti = document.getElementById('job-travel-info');
+    if (d.travel_fee > 0) {
+      ti.style.display='block';
+      ti.innerHTML = `📍 Worker is ~${d.distance_km}km away · Travel fee: ₹${d.travel_fee} (${Math.round(d.travel_fee/d.total_amount*100)}% of job cost) · Total: ₹${d.total_amount}`;
+    } else { ti.style.display='none'; }
+    openModal('modal-job-otp');
+    loadClHome();
+    toast('Job booked! 🎉');
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function loadClJobs() {
+  try { clJobs = await api('GET','/jobs'); renderClJobs(clJobs); } catch(e) { toast(e.message,'err'); }
+}
+
+function filterClJobs(f, btn) {
+  document.querySelectorAll('#cl-jobs .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderClJobs(f==='all'?clJobs:clJobs.filter(j=>j.status===f));
+}
+
+function renderClJobs(list) {
+  document.getElementById('cl-jobs-list').innerHTML = list.length
+    ? list.map(j=>clJobCard(j)).join('')
+    : `<div class="empty"><span class="empty-icon">📋</span><p>No jobs here</p></div>`;
+}
+
+function clJobCard(j) {
+  let actions = '';
+  if (j.status!=='completed') actions += `<span style="font-size:11px;color:var(--muted)">OTP: <strong style="color:var(--amber);letter-spacing:2px">${j.completion_otp}</strong></span>`;
+  if (j.status==='awaiting_review'&&!j.review_requested) actions += `<button class="btn btn-primary btn-sm" onclick="requestReview(${j.id})">⭐ Request Review</button>`;
+  if (j.status==='awaiting_review'&&j.review_requested) actions += `<button class="btn btn-ghost btn-sm" onclick="openRevModal(${j.id})">✍️ Enter OTP & Review</button>`;
+  actions += `<button class="btn btn-ghost btn-sm" onclick="openMsgs(${j.id},'${(j.title||'').replace(/'/g,"\\'")}')">💬</button>`;
+  if (j.status==='accepted') actions += `<button class="sos-btn btn-sm" onclick="triggerSOS(${j.id})" title="SOS">🆘 SOS</button>`;
+  return `<div class="jcard">
+    <div class="jcard-info">
+      <div class="jcard-title">${j.title}</div>
+      <div class="jcard-meta">👷 ${j.pro_name||'—'} · ${fmtDate(j.created_at)}${j.total_amount?` · ₹${j.total_amount}`:''}</div>
+    </div>
+    <div class="jcard-actions"><span class="badge badge-${j.status}">${fmtStatus(j.status)}</span>${actions}</div>
+  </div>`;
+}
+
+async function requestReview(jid) {
+  try { await api('POST',`/jobs/${jid}/request-review`); toast('Review requested! Ask the pro for their OTP 📨'); loadClJobs(); loadClHome(); }
+  catch(e) { toast(e.message,'err'); }
+}
+
+function openRevModal(jid) {
+  document.getElementById('rev-jid').value = jid;
+  document.getElementById('rev-otp-inp').value='';
+  document.getElementById('rev-otp-err').textContent='';
+  document.getElementById('rev-form-err').textContent='';
+  document.getElementById('rev-otp-step').classList.remove('hidden');
+  document.getElementById('rev-form-step').classList.add('hidden');
+  selStar=0; document.querySelectorAll('#star-row span').forEach(s=>s.style.filter='grayscale(1)');
+  openModal('modal-review');
+}
+
+async function verifyRevOTP() {
+  const otp = document.getElementById('rev-otp-inp').value.trim();
+  if (otp.length<4) { document.getElementById('rev-otp-err').textContent='Enter the OTP'; return; }
+  document.getElementById('rev-otp-step').classList.add('hidden');
+  document.getElementById('rev-form-step').classList.remove('hidden');
+}
+
+function setStar(n) {
+  selStar=n;
+  document.querySelectorAll('#star-row span').forEach((s,i)=>s.style.filter=i<n?'none':'grayscale(1)');
+}
+
+async function submitReview() {
+  const jid = document.getElementById('rev-jid').value;
+  const otp = document.getElementById('rev-otp-inp').value.trim();
+  const comment = document.getElementById('rev-comment').value.trim();
+  if (!selStar) { document.getElementById('rev-form-err').textContent='Please select a rating'; return; }
+  try {
+    await api('POST',`/jobs/${jid}/review`,{rating:selStar,comment,otp});
+    closeModal('modal-review'); toast('Review submitted! ⭐'); loadClJobs(); loadClHome();
+  } catch(e) { document.getElementById('rev-form-err').textContent=e.message; }
+}
+
+async function loadSaved() {
+  try {
+    const list = await api('GET','/saved');
+    const g = document.getElementById('cl-saved-grid');
+    g.innerHTML = list.length ? list.map(p=>`
+      <div class="pcard" onclick="viewPro(${p.id})">
+        <div class="pcard-ava">${(p.name||'?')[0]}</div>
+        <div class="pcard-name">${p.name}</div>
+        <div class="pcard-cat">${p.category||'—'}</div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="font-weight:700;color:var(--accent);font-size:13px">${p.hourly_rate?'₹'+p.hourly_rate+'/hr':'—'}</span>
+          <span style="color:var(--amber)">${stars(p.avg_rating)}</span>
+        </div>
+      </div>`).join('') : `<div class="empty" style="grid-column:1/-1"><span class="empty-icon">❤️</span><p>No saved professionals yet</p></div>`;
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function loadTxns(elId) {
+  try {
+    const list = await api('GET','/transactions');
+    document.getElementById(elId).innerHTML = list.length
+      ? `<div class="job-list">${list.map(t=>`
+          <div class="jcard">
+            <div class="jcard-info"><div class="jcard-title">${t.description||t.type}</div><div class="jcard-meta">${fmtDate(t.created_at)}</div></div>
+            <div><span style="font-weight:800;font-size:16px;color:${t.type==='payment'?'var(--red)':'var(--green)'}">${t.type==='payment'?'-':'+'} ₹${t.amount}</span></div>
+          </div>`).join('')}</div>`
+      : `<div class="empty"><span class="empty-icon">💳</span><p>No transactions yet</p></div>`;
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function saveClientProfile() {
+  try {
+    const d = {
+      name: document.getElementById('cl-edit-name').value.trim()||null,
+      phone: document.getElementById('cl-edit-phone').value.trim()||null,
+      age: parseInt(document.getElementById('cl-edit-age').value)||null,
+      gender: document.getElementById('cl-edit-gender').value||null,
+      city: document.getElementById('cl-edit-city').value.trim()||null,
+    };
+    await api('PUT','/me',d);
+    toast('Profile saved! ✅');
+    me = await api('GET','/me');
+    document.getElementById('cl-profile-name').textContent=me.name;
+    document.getElementById('cl-profile-info').textContent=[me.city,me.age?me.age+'y':null,me.gender].filter(Boolean).join(' · ');
+    document.getElementById('cl-s-name').textContent=me.name;
+  } catch(e) { toast(e.message,'err'); }
+}
+
+function triggerSOS(jid) {
+  const job = clJobs.find(j=>j.id===jid);
+  const text = `🆘 SOS ALERT!\nI have a service worker at my location.\nProfessional: ${job?.pro_name||'Unknown'}\nJob: ${job?.title||'Service'}\nTime: ${new Date().toLocaleTimeString('en-IN')}`;
+  if (navigator.share) navigator.share({title:'🆘 SOS',text});
+  else { navigator.clipboard?.writeText(text); toast('SOS info copied! Share with someone you trust.','info'); }
+}
+
+async function uploadAva(input, who) {
+  const file = input.files[0]; if (!file) return;
+  const fd = new FormData(); fd.append('file',file);
+  try {
+    const d = await api('POST','/upload/avatar',fd,true);
+    if (who==='client') { setAva('cl-ava-lg',d.url,me.name); setAva('cl-s-ava',d.url,me.name); }
+    else { setAva('pro-ava-lg',d.url,me.name); setAva('pro-s-ava',d.url,me.name); }
+    toast('Photo updated! 📸');
+  } catch(e) { toast(e.message,'err'); }
+}
+
+// ── PRO DASH ──────────────────────────────────────────────────
+function setupProDash() {
+  showScreen('pro');
+  document.getElementById('pro-s-name').textContent = me.name;
+  setAva('pro-s-ava',me.avatar,me.name);
+  setAva('pro-ava-lg',me.avatar,me.name);
+  document.getElementById('pro-profile-name').textContent=me.name;
+  const p = me.professional||{};
+  document.getElementById('pro-profile-cat').textContent=p.category||'—';
+  document.getElementById('pro-profile-level').innerHTML=levelBadge(p.level)||'';
+  ['pro-bio','pro-skills'].forEach(id=>{
+    const key=id.replace('pro-',''); if(document.getElementById(id)) document.getElementById(id).value=p[key]||'';
+  });
+  if(document.getElementById('pro-rate')) document.getElementById('pro-rate').value=p.hourly_rate||'';
+  if(document.getElementById('pro-exp')) document.getElementById('pro-exp').value=p.years_exp||'';
+  if(document.getElementById('gig-title')) document.getElementById('gig-title').value=p.gig_title||'';
+  if(document.getElementById('gig-b-price')) document.getElementById('gig-b-price').value=p.gig_basic_price||'';
+  if(document.getElementById('gig-b-desc')) document.getElementById('gig-b-desc').value=p.gig_basic_desc||'';
+  if(document.getElementById('gig-s-price')) document.getElementById('gig-s-price').value=p.gig_standard_price||'';
+  if(document.getElementById('gig-s-desc')) document.getElementById('gig-s-desc').value=p.gig_standard_desc||'';
+  if(document.getElementById('gig-p-price')) document.getElementById('gig-p-price').value=p.gig_premium_price||'';
+  if(document.getElementById('gig-p-desc')) document.getElementById('gig-p-desc').value=p.gig_premium_desc||'';
+  loadProfessions().then(()=>{ if(document.getElementById('pro-cat')&&p.category) document.getElementById('pro-cat').value=p.category; });
+  updateVerifUI();
+  loadPortfolio();
+}
+
+function proNav(tab, btn) {
+  ['home','jobs','portfolio','verify','profile','transactions'].forEach(t=>document.getElementById(`pro-${t}`).classList.toggle('hidden',t!==tab));
+  document.querySelectorAll('#screen-pro .nav-item').forEach(n=>n.classList.remove('active','active-pro'));
+  if(btn) btn.classList.add('active-pro');
+  if(tab==='home') loadProHome();
+  if(tab==='jobs') loadProJobs();
+  if(tab==='portfolio') loadPortfolio();
+  if(tab==='transactions') loadTxns('pro-txn-list');
+}
+
+async function loadProHome() {
+  try {
+    proJobs = await api('GET','/jobs');
+    const p = me.professional||{};
+    const isAvail = p.is_available;
+    document.getElementById('pro-avail-wrap').innerHTML=`
+      <div class="avail-toggle ${isAvail?'on':''}" id="avail-tog" onclick="toggleAvail()">
+        <span class="avail-dot"></span>${isAvail?'Available for jobs':'Set as Busy — click to go available'}
+      </div>`;
+    const assigned=proJobs.filter(j=>j.status==='assigned');
+    const active=proJobs.filter(j=>j.status==='accepted');
+    const revReq=proJobs.filter(j=>j.status==='awaiting_review'&&j.review_requested);
+    const done=proJobs.filter(j=>j.status==='completed');
+    document.getElementById('pro-stats').innerHTML=`
+      <div class="stat"><div class="stat-label">New Requests</div><div class="stat-val" style="color:var(--muted)">${assigned.length}</div></div>
+      <div class="stat"><div class="stat-label">Active</div><div class="stat-val" style="color:var(--blue)">${active.length}</div></div>
+      <div class="stat"><div class="stat-label">Completed</div><div class="stat-val" style="color:var(--green)">${done.length}</div></div>
+      <div class="stat"><div class="stat-label">Rating</div><div class="stat-val" style="color:var(--amber)">★ ${(p.avg_rating||0).toFixed(1)}</div></div>
+      <div class="stat"><div class="stat-label">Views</div><div class="stat-val">${p.profile_views||0}</div></div>`;
+    document.getElementById('pro-new-jobs').innerHTML=assigned.length?assigned.map(j=>proJobCard(j)).join(''):`<div class="empty"><span class="empty-icon">✅</span><p>No new requests</p></div>`;
+    document.getElementById('pro-active-jobs').innerHTML=active.length?active.map(j=>proJobCard(j)).join(''):`<div class="empty"><span class="empty-icon">🔨</span><p>No active jobs</p></div>`;
+    document.getElementById('pro-review-jobs').innerHTML=revReq.length?revReq.map(j=>proJobCard(j)).join(''):`<div class="empty"><span class="empty-icon">⭐</span><p>None pending</p></div>`;
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function loadProJobs() {
+  try { proJobs=await api('GET','/jobs'); renderProJobs(proJobs); } catch(e) { toast(e.message,'err'); }
+}
+function filterProJobs(f,btn) {
+  document.querySelectorAll('#pro-jobs .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProJobs(f==='all'?proJobs:proJobs.filter(j=>j.status===f));
+}
+function renderProJobs(list) {
+  document.getElementById('pro-jobs-list').innerHTML=list.length?list.map(j=>proJobCard(j)).join(''):`<div class="empty"><span class="empty-icon">📋</span><p>No jobs here</p></div>`;
+}
+
+function proJobCard(j) {
+  let actions='';
+  if(j.status==='assigned') actions=`<button class="btn btn-green btn-sm" onclick="acceptJob(${j.id})">✅ Accept</button><button class="btn btn-ghost btn-sm" onclick="viewClientProfile(${j.id})">👤 Client</button>`;
+  else if(j.status==='accepted') actions=`<button class="btn btn-amber btn-sm" onclick="openCompleteModal(${j.id})">🏁 Mark Done</button><button class="btn btn-ghost btn-sm" onclick="viewClientProfile(${j.id})">👤 Client</button>`;
+  else if(j.status==='awaiting_review'&&j.review_requested) actions=`<button class="btn btn-primary btn-sm" onclick="showRevOTP(${j.id})">🔑 Show OTP</button>`;
+  else if(j.status==='awaiting_review') actions=`<span style="font-size:12px;color:var(--muted);font-style:italic">Waiting for client…</span>`;
+  actions+=` <button class="btn btn-ghost btn-sm" onclick="openMsgs(${j.id},'${(j.title||'').replace(/'/g,"\\'")}')">💬</button>`;
+  return `<div class="jcard">
+    <div class="jcard-info">
+      <div class="jcard-title">${j.title}</div>
+      <div class="jcard-meta">👤 ${j.client_name||'Client'} · 📅 ${fmtDate(j.created_at)}${j.total_amount?` · ₹${j.total_amount}`:''}</div>
+    </div>
+    <div class="jcard-actions"><span class="badge badge-${j.status}">${fmtStatus(j.status)}</span>${actions}</div>
+  </div>`;
+}
+
+function viewClientProfile(jid) {
+  const j = proJobs.find(x=>x.id===jid); if(!j) return;
+  const ava = j.client_avatar ? `<img src="${j.client_avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:16px"/>` : (j.client_name||'?')[0].toUpperCase();
+  document.getElementById('modal-client-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px;background:var(--surface2);border-radius:var(--r)">
+      <div class="client-popup-ava">${ava}</div>
+      <div>
+        <div style="font-size:20px;font-weight:800">${j.client_name||'Client'}</div>
+        <div style="color:var(--muted);font-size:13px">Client</div>
+      </div>
+    </div>
+    <div style="padding:0 4px">
+      ${j.client_city?`<div class="info-row"><span class="info-icon">📍</span> <span>${j.client_city}</span></div>`:''}
+      ${j.client_age?`<div class="info-row"><span class="info-icon">🎂</span> <span>${j.client_age} years old</span></div>`:''}
+      ${j.client_gender?`<div class="info-row"><span class="info-icon">👤</span> <span>${j.client_gender}</span></div>`:''}
+      ${j.client_phone?`<div class="info-row"><span class="info-icon">📞</span> <span>${j.client_phone}</span></div>`:''}
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-weight:700;margin-bottom:8px">Job Details</div>
+        <div class="info-row"><span class="info-icon">🔨</span> <span style="font-weight:600">${j.title}</span></div>
+        ${j.description?`<div class="info-row"><span class="info-icon">📝</span> <span>${j.description}</span></div>`:''}
+        <div class="info-row"><span class="info-icon">📦</span> <span>${j.package||'basic'} package</span></div>
+        <div class="info-row"><span class="info-icon">💰</span> <span>${j.payment_method==='cash'?'Cash on Delivery':'Online Payment'}</span></div>
+        ${j.total_amount?`<div class="info-row"><span class="info-icon">💵</span> <span style="font-weight:700">₹${j.total_amount} total</span></div>`:''}
+        ${j.distance_km?`<div class="info-row"><span class="info-icon">📍</span> <span>${j.distance_km}km away · Travel fee: ₹${j.travel_fee}</span></div>`:''}
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-full" style="margin-top:16px" onclick="openMsgs(${j.id},'${(j.title||'').replace(/'/g,"\\'")}');closeModal('modal-client-profile')">💬 Message Client</button>`;
+  openModal('modal-client-profile');
+}
+
+async function acceptJob(jid) {
+  try { await api('PUT',`/jobs/${jid}/accept`); toast('Job accepted! 🎉'); loadProHome(); }
+  catch(e) { toast(e.message,'err'); }
+}
+
+function openCompleteModal(jid) {
+  document.getElementById('complete-jid').value=jid;
+  document.getElementById('complete-otp-inp').value='';
+  document.getElementById('complete-err').textContent='';
+  openModal('modal-complete');
+}
+
+async function submitCompleteOTP() {
+  const jid=document.getElementById('complete-jid').value;
+  const otp=document.getElementById('complete-otp-inp').value.trim();
+  if(!otp) { document.getElementById('complete-err').textContent='Enter the OTP'; return; }
+  try {
+    await api('PUT',`/jobs/${jid}/complete`,{otp});
+    closeModal('modal-complete'); toast('Job marked complete! ✅'); loadProHome();
+  } catch(e) { document.getElementById('complete-err').textContent=e.message; }
+}
+
+async function showRevOTP(jid) {
+  try {
+    const d=await api('GET',`/jobs/${jid}/review-otp`);
+    currentRevOTPJobId=jid;
+    document.getElementById('rev-otp-show').textContent=d.review_otp;
+    openModal('modal-show-rev-otp');
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function toggleAvail() {
+  try {
+    const d=await api('PUT','/professionals/availability');
+    if(me.professional) me.professional.is_available=d.is_available;
+    const el=document.getElementById('avail-tog');
+    el.classList.toggle('on',d.is_available);
+    el.innerHTML=`<span class="avail-dot"></span>${d.is_available?'Available for jobs':'Set as Busy — click to go available'}`;
+    toast(d.is_available?'🟢 You\'re available':'🔴 Set to busy');
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function loadPortfolio() {
+  try {
+    const me2=await api('GET','/me');
+    const ports=(me2.professional?.portfolio)||[];
+    const g=document.getElementById('pro-port-grid'); if(!g) return;
+    g.innerHTML=ports.length?ports.map(p=>`
+      <div class="port-item">
+        <img src="${p.url}" alt="${p.caption||''}"/>
+        <button class="port-del" onclick="delPortItem(${p.id},event)">×</button>
+      </div>`).join(''):`<div class="empty" style="grid-column:1/-1"><span class="empty-icon">🖼️</span><p>Upload your work photos</p></div>`;
+  } catch(_){}
+}
+
+async function uploadPortfolio(input) {
+  const files=Array.from(input.files); if(!files.length) return;
+  try {
+    for(const file of files) {
+      const fd=new FormData(); fd.append('file',file);
+      await api('POST','/upload/portfolio',fd,true);
+    }
+    toast(`${files.length} photo(s) uploaded! 📸`);
+    loadPortfolio();
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function delPortItem(pid,e) {
+  e.stopPropagation();
+  try { await api('DELETE',`/upload/portfolio/${pid}`); toast('Deleted'); loadPortfolio(); }
+  catch(e) { toast(e.message,'err'); }
+}
+
+async function uploadAadhaar(input) {
+  const file=input.files[0]; if(!file) return;
+  const fd=new FormData(); fd.append('file',file);
+  try { await api('POST','/upload/aadhaar',fd,true); toast('Aadhaar uploaded! 🪪'); me=await api('GET','/me'); updateVerifUI(); }
+  catch(e) { toast(e.message,'err'); }
+}
+
+async function uploadWorkProof(input) {
+  const file=input.files[0]; if(!file) return;
+  const fd=new FormData(); fd.append('file',file);
+  try { await api('POST','/upload/work-proof',fd,true); toast('Work proof uploaded! 📸'); me=await api('GET','/me'); updateVerifUI(); }
+  catch(e) { toast(e.message,'err'); }
+}
+
+async function saveVerifDetails() {
+  try {
+    const d={
+      years_exp:parseInt(document.getElementById('vi-years').value)||null,
+      emergency_contact:document.getElementById('vi-emg').value.trim()||null,
+      references_text:document.getElementById('vi-ref-text').value.trim()||null,
+    };
+    await api('PUT','/professionals/profile',d);
+    toast('Details saved! ✅'); me=await api('GET','/me'); updateVerifUI();
+  } catch(e) { toast(e.message,'err'); }
+}
+
+function updateVerifUI() {
+  const p=me.professional||{};
+  const level=p.verification_level||'unverified';
+  const badges={verified:{icon:'🛡️',text:'Verified',color:'var(--green)'},partial:{icon:'⚡',text:'Partially Verified',color:'var(--amber)'},unverified:{icon:'🔓',text:'Unverified',color:'var(--muted)'}};
+  const b=badges[level]||badges.unverified;
+  const bEl=document.getElementById('verif-badge-display'); if(bEl) bEl.textContent=b.icon;
+  const lEl=document.getElementById('verif-level-text'); if(lEl){lEl.textContent=b.text; lEl.style.color=b.color;}
+  const checks={aadhaar:!!p.aadhaar_url,proof:!!(p.work_proof_urls&&JSON.parse(p.work_proof_urls||'[]').length),quiz:p.skill_score>=3,refs:!!p.references_text,emergency:!!p.emergency_contact};
+  Object.entries(checks).forEach(([k,v])=>{const el=document.getElementById(`vi-${k}`); if(el) el.textContent=v?'✅':'❌';});
+  if(p.years_exp&&document.getElementById('vi-years')) document.getElementById('vi-years').value=p.years_exp;
+  if(p.emergency_contact&&document.getElementById('vi-emg')) document.getElementById('vi-emg').value=p.emergency_contact;
+  if(p.references_text&&document.getElementById('vi-ref-text')) document.getElementById('vi-ref-text').value=p.references_text;
+}
+
+// ── QUIZ ─────────────────────────────────────────────────────
+async function startQuiz() {
+  const p=me.professional||{};
+  try {
+    const d=await api('GET',`/quiz/${p.category||'default'}`);
+    quizQs=d.questions; quizIdx=0; quizScore=0; quizAnswered=false;
+    renderQuizQ();
+    openModal('modal-quiz');
+  } catch(e) { toast(e.message,'err'); }
+}
+
+function renderQuizQ() {
+  const q=quizQs[quizIdx];
+  document.getElementById('quiz-body').innerHTML=`
+    <div class="quiz-progress"><div class="quiz-progress-fill" style="width:${(quizIdx/quizQs.length)*100}%"></div></div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Question ${quizIdx+1} of ${quizQs.length}</div>
+    <div style="font-weight:700;font-size:15px;margin-bottom:16px;line-height:1.5">${q.q}</div>
+    ${q.opts.map((opt,i)=>`<div class="quiz-opt" id="qopt-${i}" onclick="answerQ(${i},${q.ans})">${opt}</div>`).join('')}`;
+  quizAnswered=false;
+}
+
+function answerQ(idx, correct) {
+  if(quizAnswered) return;
+  quizAnswered=true;
+  if(idx===correct) quizScore++;
+  document.getElementById(`qopt-${idx}`).classList.add(idx===correct?'correct':'wrong');
+  document.getElementById(`qopt-${correct}`).classList.add('correct');
+  setTimeout(()=>{
+    quizIdx++;
+    if(quizIdx<quizQs.length) renderQuizQ();
+    else {
+      document.getElementById('quiz-body').innerHTML=`
+        <div style="text-align:center;padding:20px">
+          <div style="font-size:48px;margin-bottom:12px">${quizScore>=4?'🏆':quizScore>=3?'👍':'😅'}</div>
+          <div style="font-size:22px;font-weight:800;margin-bottom:8px">${quizScore}/${quizQs.length} correct</div>
+          <div style="color:var(--muted);margin-bottom:20px">${quizScore>=3?'Great! Skill badge earned!':'Keep practicing. You can retake anytime.'}</div>
+          <button class="btn btn-primary btn-full" onclick="submitQuiz(${quizScore})">Save Result</button>
+        </div>`;
+    }
+  },900);
+}
+
+async function submitQuiz(score) {
+  try {
+    await api('POST','/quiz/submit',{score});
+    closeModal('modal-quiz'); toast(`Quiz saved! Score: ${score}/${quizQs.length} 🧠`);
+    me=await api('GET','/me'); updateVerifUI();
+  } catch(e) { toast(e.message,'err'); }
+}
+
+async function saveProProfile() {
+  try {
+    const cat=document.getElementById('pro-cat').value;
+    const customCat=document.getElementById('pro-custom-cat')?.value.trim()||null;
+    const d={
+      category:cat, custom_category:cat==='Custom'?customCat:null,
+      bio:document.getElementById('pro-bio').value.trim()||null,
+      skills:document.getElementById('pro-skills').value.trim()||null,
+      hourly_rate:parseFloat(document.getElementById('pro-rate').value)||null,
+      years_exp:parseInt(document.getElementById('pro-exp').value)||null,
+      gig_title:document.getElementById('gig-title').value.trim()||null,
+      gig_basic_price:parseFloat(document.getElementById('gig-b-price').value)||null,
+      gig_basic_desc:document.getElementById('gig-b-desc').value.trim()||null,
+      gig_standard_price:parseFloat(document.getElementById('gig-s-price').value)||null,
+      gig_standard_desc:document.getElementById('gig-s-desc').value.trim()||null,
+      gig_premium_price:parseFloat(document.getElementById('gig-p-price').value)||null,
+      gig_premium_desc:document.getElementById('gig-p-desc').value.trim()||null,
+    };
+    await api('PUT','/professionals/profile',d);
+    toast('Profile saved! 💼');
+    me=await api('GET','/me');
+    document.getElementById('pro-profile-cat').textContent=cat==='Custom'?customCat:cat;
+  } catch(e) { toast(e.message,'err'); }
+}
+
+// ── MESSAGES ─────────────────────────────────────────────────
+async function openMsgs(jid, title) {
+  document.getElementById('msgs-jid').value=jid;
+  document.getElementById('msgs-title').textContent=`💬 ${title||'Messages'}`;
+  document.getElementById('msg-inp').value='';
+  openModal('modal-msgs');
+  await loadMsgs(jid);
+}
+
+async function loadMsgs(jid) {
+  try {
+    const msgs=await api('GET',`/jobs/${jid}/messages`);
+    const area=document.getElementById('msg-area');
+    area.innerHTML=msgs.length?msgs.map(m=>{
+      const isMe=m.sender_id===me.id;
+      return `<div><div class="msg-bubble ${isMe?'msg-me':'msg-them'}">${m.content}<div class="msg-meta">${isMe?'You':m.sender_name}</div></div></div>`;
+    }).join(''):`<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px">No messages yet. Say hi!</div>`;
+    area.scrollTop=area.scrollHeight;
+  } catch(e){}
+}
+
+async function sendMsg() {
+  const jid=document.getElementById('msgs-jid').value;
+  const content=document.getElementById('msg-inp').value.trim();
+  if(!content) return;
+  try {
+    await api('POST',`/jobs/${jid}/messages`,{content});
+    document.getElementById('msg-inp').value='';
+    await loadMsgs(jid);
+  } catch(e) { toast(e.message,'err'); }
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async ()=>{
+  // Seed demo data
+  try { await api('POST','/seed'); } catch(_){}
+  if(token) {
+    try { await initDash(); }
+    catch { logout(); showScreen('landing'); }
+  } else { showScreen('landing'); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+2026-05-04 14:24:15,170 [WARNING] FAILED LOGIN — email: harshitj594@gmail.com, IP: 127.0.0.1
+2026-05-04 14:24:15,662 [WARNING] FAILED LOGIN — email: harshitj594@gmail.com, IP: 127.0.0.1
+2026-05-04 14:24:15,807 [WARNING] FAILED LOGIN — email: harshitj594@gmail.com, IP: 127.0.0.1
+2026-05-04 14:24:15,979 [WARNING] FAILED LOGIN — email: harshitj594@gmail.com, IP: 127.0.0.1
+2026-05-04 14:24:16,111 [WARNING] SECURITY — IP 127.0.0.1 locked out after 5 failed attempts (last email: harshitj594@gmail.com)
+2026-05-04 14:24:16,111 [WARNING] FAILED LOGIN — email: harshitj594@gmail.com, IP: 127.0.0.1
+2026-05-04 14:24:20,227 [WARNING] LOGIN BLOCKED — IP 127.0.0.1 is locked out for 15 more minutes
+2026-05-04 14:24:20,724 [WARNING] LOGIN BLOCKED — IP 127.0.0.1 is locked out for 15 more minutes
+2026-05-04 14:24:20,925 [WARNING] LOGIN BLOCKED — IP 127.0.0.1 is locked out for 15 more minutes
+2026-05-04 14:24:21,106 [WARNING] LOGIN BLOCKED — IP 127.0.0.1 is locked out for 15 more minutes
+2026-05-04 14:24:21,285 [WARNING] LOGIN BLOCKED — IP 127.0.0.1 is locked out for 15 more minutes
+2026-05-04 14:24:21,476 [WARNING] LOGIN BLOCKED — IP 127.0.0.1 is locked out for 15 more minutes
